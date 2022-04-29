@@ -8,7 +8,7 @@ import qualified Data.List.NonEmpty as NE
 import Data.List.NonEmpty (NonEmpty((:|)))
 
 import qualified Data.Aeson as Aeson
-import qualified Data.HashMap.Strict as HashMap
+import qualified Data.Aeson.KeyMap as KeyMap
 
 import qualified Data.GraphQL.AST as AST
 import qualified Data.GraphQL.AST.Core as AST.Core
@@ -33,6 +33,6 @@ document _ _ = error "Multiple operations not supported yet"
 
 operation :: Alternative f => Schema f -> AST.Core.Operation -> f Aeson.Value
 operation schema (AST.Core.Query flds) =
-  Aeson.Object . HashMap.singleton "data"
+  Aeson.Object . KeyMap.singleton "data"
              <$> Schema.resolve (NE.toList schema) (NE.toList flds)
 operation _ _ = error "Mutations not supported yet"

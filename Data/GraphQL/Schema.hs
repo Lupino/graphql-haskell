@@ -31,8 +31,9 @@ import Data.Maybe (fromMaybe)
 import Data.Monoid (Alt(Alt,getAlt))
 
 import qualified Data.Aeson as Aeson
-import Data.HashMap.Strict (HashMap)
-import qualified Data.HashMap.Strict as HashMap
+import Data.Aeson.Key (fromText)
+import Data.Aeson.KeyMap (KeyMap)
+import qualified Data.Aeson.KeyMap as KeyMap
 import Data.Text (Text)
 
 import Data.GraphQL.AST.Core
@@ -136,15 +137,15 @@ enumA _ _ _ = empty
 -- | Helper function to facilitate 'Argument' handling.
 withField
   :: (Alternative f, Aeson.ToJSON a)
-  => Name -> f a -> Field -> f (HashMap Text Aeson.Value)
+  => Name -> f a -> Field -> f (KeyMap Aeson.Value)
 withField name v (Field alias name' _ _) =
   if name == name'
-    then fmap (HashMap.singleton aliasOrName . Aeson.toJSON) v
+    then fmap (KeyMap.singleton aliasOrName . Aeson.toJSON) v
          -- TODO: Report error when Non-Nullable type for field argument.
-     <|> pure (HashMap.singleton aliasOrName Aeson.Null)
+     <|> pure (KeyMap.singleton aliasOrName Aeson.Null)
     else empty
   where
-    aliasOrName = fromMaybe name alias
+    aliasOrName = fromText $ fromMaybe name alias
 
 -- | Takes a list of 'Resolver's and a list of 'Field's and applies each
 --   'Resolver' to each 'Field'. Resolves into a value containing the
